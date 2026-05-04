@@ -18,6 +18,7 @@ namespace NuGetLicense.LicenseValidator
     {
         private readonly IEnumerable<string> _allowedLicenses;
         private readonly IFileDownloader _fileDownloader;
+        private readonly IImmutableDictionary<string, Uri> _downloadSources;
         private readonly IFileLicenseMatcher _fileLicenseMatcher;
         private readonly string[] _ignoredPackages;
         private readonly IImmutableDictionary<Uri, string> _licenseMapping;
@@ -26,13 +27,16 @@ namespace NuGetLicense.LicenseValidator
             IEnumerable<string> allowedLicenses,
             IFileDownloader fileDownloader,
             IFileLicenseMatcher fileLicenseMatcher,
-            string[] ignoredPackages)
+            string[] ignoredPackages,
+            IImmutableDictionary<string, Uri>? downloadSources = null
+            )
         {
             _licenseMapping = licenseMapping;
             _allowedLicenses = allowedLicenses;
             _fileDownloader = fileDownloader;
             _fileLicenseMatcher = fileLicenseMatcher;
             _ignoredPackages = ignoredPackages;
+            _downloadSources = downloadSources ?? ImmutableDictionary<string, Uri>.Empty;
         }
 
         public async Task<IEnumerable<LicenseValidationResult>> Validate(
@@ -221,7 +225,13 @@ namespace NuGetLicense.LicenseValidator
         {
             if (info.LicenseUrl!.IsAbsoluteUri)
             {
-                await DownloadLicenseAsync(info.LicenseUrl, info.Identity, context, token);
+                var url = _downloadSources.ContainsKey(info.LicenseUrl.AbsoluteUri) switch
+                {
+                    true => _downloadSources[info.LicenseUrl.AbsoluteUri],
+                    _ => info.LicenseUrl
+                };
+
+                await DownloadLicenseAsync(url, info.Identity, context, token);
             }
 
             if (_licenseMapping.TryGetValue(info.LicenseUrl, out string? licenseId))
@@ -314,8 +324,13 @@ namespace NuGetLicense.LicenseValidator
             return $"License \"{license}\" not found in list of supported licenses";
         }
 
-        private static Uri GetLicenseUrl(string spdxIdentifier)
+        private Uri GetLicenseUrl(string spdxIdentifier)
         {
+            if(_downloadSources?.ContainsKey(spdxIdentifier) == true)
+            {
+                return _downloadSources[spdxIdentifier];
+            }
+
             return new Uri($"https://licenses.nuget.org/({spdxIdentifier})");
         }
 

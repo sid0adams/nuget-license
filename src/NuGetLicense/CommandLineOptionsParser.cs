@@ -130,6 +130,18 @@ namespace NuGetLicense
             return new FileDownloader(_httpClient, downloadLicenseInformation);
         }
 
+        public IImmutableDictionary<string, Uri> GetDownloadLicenseSourcesInformation(string? downloadSources)
+        {
+            if (downloadSources is null)
+            {
+                return ImmutableDictionary<string, Uri>.Empty;
+            }
+
+            Dictionary<string, Uri> downloadSourcesInformation = JsonSerializer.Deserialize<Dictionary<string, Uri>>(_fileSystem.File.ReadAllText(downloadSources))!;
+
+            return ImmutableDictionary.CreateRange(downloadSourcesInformation);
+        }
+
         public IOutputFormatter GetOutputFormatter(OutputType outputType, bool returnErrorsOnly, bool includeIgnoredPackages)
         {
             return outputType switch

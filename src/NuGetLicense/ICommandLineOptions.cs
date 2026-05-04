@@ -15,6 +15,7 @@ namespace NuGetLicense
         string? LicenseMapping { get; }
         string? OverridePackageInformation { get; }
         string? DownloadLicenseInformation { get; }
+        string? DownloadLicenseSourcesInformation { get; }
         OutputType OutputType { get; }
         public bool ReturnErrorsOnly { get; }
         public bool IncludeIgnoredPackages { get; }

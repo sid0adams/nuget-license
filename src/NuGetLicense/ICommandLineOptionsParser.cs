@@ -56,6 +56,13 @@ namespace NuGetLicense
         IFileDownloader GetFileDownloader(string? downloadLicenseInformation);
 
         /// <summary>
+        /// Gets the download sources mapping from the command line options.
+        /// </summary>
+        /// <param name="downloadSources"></param>
+        /// <returns></returns>
+        IImmutableDictionary<string, Uri> GetDownloadLicenseSourcesInformation(string? downloadSources);
+
+        /// <summary>
         /// Gets the output formatter from the command line options.
         /// </summary>
         IOutputFormatter GetOutputFormatter(OutputType outputType, bool returnErrorsOnly, bool includeIgnoredPackages);

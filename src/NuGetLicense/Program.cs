@@ -41,6 +41,9 @@ namespace NuGetLicense
         [Option("-d|--license-information-download-location", Description = "Specifies a folder where the application will download all licenses provided via license URLs.")]
         public string? DownloadLicenseInformation { get; set; }
 
+        [Option("-ds|--license-information-download-sources", Description = "Specifies a JSON file containing a dictionary to map spdix expression to custom license source.")]
+        public string? DownloadLicenseSourcesInformation { get; set; }
+
         [Option("-o|--output", Description = "Specifies the output format. Valid values are Table, Markdown, Json, JsonPretty or CSV (default: Table).")]
         public OutputType OutputType { get; set; } = OutputType.Table;
 

@@ -60,6 +60,7 @@ namespace NuGetLicense
             string[] allowedLicensesArray = _optionsParser.GetAllowedLicenses(options.AllowedLicenses);
             CustomPackageInformation[] overridePackageInformationArray = _optionsParser.GetOverridePackageInformation(options.OverridePackageInformation);
             IFileDownloader licenseDownloader = _optionsParser.GetFileDownloader(options.DownloadLicenseInformation);
+            IImmutableDictionary<string, Uri> downloadSourcesInformation = _optionsParser.GetDownloadLicenseSourcesInformation(options.DownloadLicenseSourcesInformation);
             IOutputFormatter output = _optionsParser.GetOutputFormatter(options.OutputType, options.ReturnErrorsOnly, options.IncludeIgnoredPackages);
 
             var projectCollector = new ProjectsCollector(_solutionPersistance, _fileSystem);
@@ -73,7 +74,8 @@ namespace NuGetLicense
                 allowedLicensesArray,
                 licenseDownloader,
                 _optionsParser.GetLicenseMatcher(options.LicenseFileMappings),
-                ignoredPackagesArray);
+                ignoredPackagesArray,
+                downloadSourcesInformation);
 
             string[] excludedProjectsArray = _optionsParser.GetExcludedProjects(options.ExcludedProjects);
             IEnumerable<string> projects = (await inputFiles.SelectManyAsync(projectCollector.GetProjectsAsync)).Where(p => !Array.Exists(excludedProjectsArray, ignored => p.PathLike(ignored)));
